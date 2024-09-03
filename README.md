@@ -197,3 +197,127 @@ data = 'Bob'; // 上書きはNG
 
 final String name = myName(); // 動的な値もOK
 ```
+
+### Dartの関数
+- 以下のように普通に書く
+```dart
+String myFunction(int number){
+    return number.toString();
+}
+
+void sayHello(){
+    print('Hello World!!');
+    return;
+}
+```
+- アロー関数もかける
+```dart
+void sayHello() => print('Hello World!!');
+```
+- 非同期関数は、`async {}`と書いて返り値を`Future`というデータ型にする
+```dart
+// ex. APIを呼び出し、レスポンスを受け取るまで処理を待つ関数
+Future<String> callApiFunction(int countryCode) async {
+    return await getWeatherFromAPI(countryCode);
+}
+```
+- 呼び出す側も非同期関数にする必要がある
+```dart
+Future<void> main() async {
+    final weather = await callApiFunction(81);
+}
+```
+- 引数を`{}`で囲うと名前付き引数を受け取る関数を定義できる
+  - 必須であれば`required`をつけて、必須でなければ`null`許容型`?`にする
+```dart
+// 引数が必須の関数
+String mySecondFunction({required int age}){
+    return age.toString();
+}
+
+// 引数が必須ではない関数
+void myThirdFunction({int? age}){
+    print(age);
+    print('Age might be null');
+}
+
+// 呼び出し
+void main(){
+   final String result = mySecondFunction(age:18);
+}
+```
+
+### Dartのクラス
+- 以下のように書ける
+```dart
+class MyClass {
+  // フィールド
+  int _a;
+  String _b;
+
+  // ゲッター
+  int get a => _a;
+  String get b => _b;
+
+  // セッター
+  set a(int value) => _a = value;
+  set b(String value) => _b = value;
+
+  // コンストラクタ　
+  // 引数がそのままフィールドに代入される
+  MyClass(this._a, this._b);
+
+  // Factoryコンストラクタ
+  factory MyClass.fromJson(Map<String, dynamic> json) {
+    return MyClass(json['a'], json['b']);
+  }
+
+  // メソッド
+  void printValues() {
+    print('a = $_a, b = $_b');
+  }
+
+  // staticメンバ
+  static int myInt = 20;
+  static void myFunc() {
+    print('static var is $myInt');
+  }
+}
+
+// 呼び出し(インスタンス化)
+void main(){
+
+    final MyClass myClass = MyClass(10, 'hello');
+
+    print(myClass.a); // output: 10
+    print(myClass.b); // output: hello
+    myClass.printValues(); // output:a = 10, b = hello
+
+    print(MyClass.myInt); // output: 20
+    MyClass.myFunc(); // output: static var is 20
+}
+```
+- 変数名の先頭にアンダースコア`_`を付けることでプライベート変数化できる
+```dart
+void myGlobalFunction(){
+    print('This is global');
+}
+
+void _myPrivateFunction(){
+    print('This is private');
+}
+
+void myFunction(){
+        myGlobalFunction(); // OK
+        _myPrivateFunction(); // OK：同一ファイル内の為アクセス可能
+}
+```
+### Fractoryコンストラクタ
+- `factory`を用いてインスタンス化の際に複雑な処理が可能
+  - 自由に引数を受け取りインスタンスを返すことができる
+```dart
+// Factoryコンストラクタ
+factory MyClass.fromJson(Map<String, dynamic> json) {
+  return MyClass(json['a'], json['b']);
+}
+```
