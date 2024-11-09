@@ -321,3 +321,43 @@ factory MyClass.fromJson(Map<String, dynamic> json) {
   return MyClass(json['a'], json['b']);
 }
 ```
+
+### `for in`
+- 配列やマップを回す
+- pythonのfor文やC#のforeach
+```dart
+// Listの中身を取り出す
+List <int> numbers = [1, 2, 3, 4, 5];
+for (int n in numbers) {
+  print(n);
+}
+
+Map<int, String> myMap = {81: 'JP', 1:'US', 44:'GB'};
+// keyのみを取り出す
+for (int key in myMap.keys) {
+  print(key);
+}
+// valueのみを取り出す
+for (var value in myMap.values) {
+  print(value);
+}
+// keyとvalueどちらにもアクセス
+for (var entry in myMap.entries) {
+  print('Key: ${entry.key}, Value: ${entry.value}');
+}
+```
+
+### 例外処理
+- `try`, `catch`, `finally`, `throw`を以下のように使える
+```dart
+try{
+  print("try block");
+  throw Error();
+} on AppError catch(error, stackTrace) {
+  print('App error captured: $error');
+} on PlatformError catch(error, stackTrace){
+  print('Platform error captured: $error');
+} finally {
+  print("finally block");
+}
+```
