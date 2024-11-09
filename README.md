@@ -395,3 +395,71 @@ try{
 - `containsValue()`
 - `map()`
 - `forEach()`
+
+### Flutterの基本的なコマンド
+- `flutter help`
+  - flutterコマンド一覧取得
+- `flutter create [プロジェクト名]`
+  - プロジェクトを作成
+- `flutter doctor`
+  - Flutter開発で必要とされるツールの設定状況を確認
+  - vオプションで詳細情報を表示
+- `flutter devices`
+  - Flutterアプリを起動する際に使えるデバイスを確認
+- `flutter pub add`
+  - アプリで使用するパッケージをインストールするコマンド
+  - `pubspec.yaml`に依存関係を追加
+- `flutter run`
+  - アプリを起動するコマンド
+  - dオプションでデバイスを指定
+  - 起動後に`r`->Enterでリフレッシュ
+  - `R`->Enterでホットリロード
+- `flutter build`
+  - アプリをコンパイル
+  - `flutter build apk`でAndroid用のapkファイルをビルド
+  - `flutter build ios`でIOS用のファイルをビルド
+
+### シミュレータの設定と起動
+#### IOS
+- `open -a Simulator`で起動
+- Simulator起動後は上のFile->Open Simulatorからデバイス変更が可能
+#### Android
+- Android Studio起動
+- Virtual device manegerクリック
+- 既存のデバイスを選択または作成
+
+### Flutterプロジェクト動かし方
+- `flutter create`でプロジェクト作成
+- Simulator起動
+- `flutter devices`でSimulatorのID確認
+- プロジェクトに移動して`flutter run -d [id]`を実行
+- 立ち上がる
+- `flutter run`をCtrl+Cで止めると終了
+
+### Flutterプロジェクトの中身
+#### `lib`ディレクトリ
+- 実際にアプリのコードを記述するディレクトリ
+- `main.dart`がFlutterアプリのエントリーポイント
+#### `analysis_options.yaml`
+- Dartのコードを解析する際の設定ファイル
+#### `ios`, `android`, `web`, `macos`, `linux`, `windows`ディレクトリ
+- Platformごとのディレクトリ
+- `lib`ディレクトリに記述されたコードを各種platformにたいおうしたコードに変換する際に参照される
+#### `pubspec.yaml`, `pubspec.lock`
+- Flutterのパッケージ管理に関するファイル
+- `pubspec.yaml`にはパッケージの依存関係を記述
+- `pubspec.lock`にはその依存関係を解決した結果が記述される
+#### `test`ディレクトリ
+- Flutterのテストコードを記述
+#### `ios`ディレクトリ内
+- `ios/Runner/AppDelegate.swift`
+  - IOS特有の機能などを使う場合にIOS側に処理の実装が必要な場合がある
+  - その場合はこのファイルに記述
+- `ios/Runner/Info.plist`
+  - 位置情報の取得やBlueToothの使用などユーザーに許可を求める機能を使用する場合にはこのファイルに設定を記述
+#### `android`ディレクトリ内
+- `android/app/build.gradle`
+  - Androidのアプリケーションに関する設定ファイル
+  - コンパイルに使うSDKのバージョンやアプリケーションの設定などを記述
+- `android/app/src/main/AndroidManifest.xml`
+  - 位置情報の取得やBlueToothの使用などユーザーに許可を求める機能を使う場合にこのファイルに設定を記述
