@@ -361,3 +361,37 @@ try{
   print("finally block");
 }
 ```
+
+### List操作
+- `add()`
+- `addAll()`
+- `remove()`
+- `removeWhere()`
+- `contains()`
+- `any()`
+- `every()`
+- `where()`
+- `firstWhere()`
+- `sublist()`
+- `indexOf()`
+- `indexWhere()`
+- `sort()`
+- `shuffle()`
+- `asMap()`
+- `toList()`
+- `toSet()`
+- `join()`
+- `reduce()`
+- `fold()`
+- `from()`
+### Map操作
+- `addAll()`
+- `addEntries()`
+- `remove()`
+- `removeWhere()`
+- `update()`
+- `updateAll()`
+- `containsKey()`
+- `containsValue()`
+- `map()`
+- `forEach()`
