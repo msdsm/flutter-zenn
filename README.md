@@ -702,3 +702,114 @@ class MyApp extends StatelessWidget {
   - 他にもいくつかのボタンWidgetがある
   - ボタンWidgetはユーザーのタップを検知することができ、タップされた際に実行する処理を`onPressed`フィールドに渡すことができる
 - `Icon`Widgetはアイコンを表示するためのWidget
+
+### 画面遷移
+- Flutterでは`Navigator`クラスに`Route`クラスでラップしたページを渡すことでページの遷移を行う
+- `Navigator`はstack構造になっていてページ遷移するたびにページが積まれていきユーザーはtopのページを見ている
+  - そのため遷移してきたページを逆順に戻れる
+- 以下はあるページからPageBに遷移するコード
+```dart
+Navigator.of(context).push(
+  MaterialPageRoute(
+    builder: (context) => PageB()
+  ),
+);
+```
+- `Navigator`クラスの`push`メソッドに`PageB`クラスをラップした`MaterialPageRoute`クラスを渡している
+- `MaterialPageRoute`は`Route`クラスを継承したクラスでマテリアルデザインに沿ったページ遷移を行うための`Route`クラス
+- `MaterialPageRoute`クラスの`builder`というパラメータはコールバック関数を受け取りその返り値として`Navigator`クラスに渡したいページを指定する
+```dart
+MaterialPageRoute(
+  builder: (context) => PageB(),
+),
+```
+- これを使用してボタンを押すと画面遷移する機能は以下のように書ける
+```dart
+FloatinActionButton(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PageB(),
+      ),
+    );
+  },
+)
+```
+- ページを追加して遷移する`push()`メソッド以外にも`pop()`,`pushReplacement()`,`pushAndRemoveUntil()`, `popUntil()`などがある
+
+#### `pop()`
+- 前のページに遷移するメソッドであり、現在見ているページを破棄する
+```dart
+Navigator.of(context).pop();
+```
+- このpop時に値を渡すということも可能
+- 値を返す画面へ遷移する際に返り値を受け取る前提で処理を記述すればよい
+- 返り値を受け取る処理は非同期処理なので`async`と`await`を使用する
+- 値が返されない場合もあるので`nullable`な型にする(`String?`のように)
+```dart
+
+// 値を受け取る前提で遷移する
+...
+onTap: () async {
+   final String? result = await Navigator.of(context).push<String?>(
+        MaterialPageRoute(
+            builder: (context) => PageB(),
+        ),
+    );
+    print(result);
+},
+...
+
+// 値を持って、前の画面に戻る
+Navigator.of(context).pop('戻る際に渡したい値');
+```
+
+
+#### `pushReplacement()`
+- 現在のページを新しいページと入れ替えるメソッド
+```dart
+Navigator.of(context).pushReplacement(
+    MaterialPageRoute(
+        builder: (context) => PageB(),
+    ),
+);
+```
+- 一番上にスタックされている`Route`オブジェクトを新しい`Route`オブジェクトと差し替える
+
+#### `pushAndRemoveUntil()`
+- 次のページに遷移しつつ、特定の条件のページまで過去のページを取り除くメソッド
+- 第一引数に遷移先の`Route`オブジェクトを渡す
+- 第二引数にはコールバック関数を渡す
+  - このコールバック関数の引数は`Route`オブジェクト
+  - コールバック関数の返り値はboolで、返り値がtrueとなるまで`Route`オブジェクトを取り除き続ける
+
+```dart
+// 全ての過去のページを取り除く
+Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(
+        builder: (context) => PageD(),
+    ),
+    (route) => false,
+);
+
+// パス名が'/home'のページに辿り着くまで過去のページを取り除く
+Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(
+        builder: (context) => PageD(),
+    ),
+    (route) => route.settings.name == '/home',
+);
+```
+
+#### `popUntil()`
+- 指定のページまで一気に戻るメソッド
+- 引数にコールバック関数を渡す
+  - コールバック関数の引数は`Route`オブジェクト
+  - 返り値はboolでtrueを返すまでスタックされている`Route`オブジェクトを取り除く
+```dart
+// 特定のページまで戻る
+Navigator.of(context).popUntil((route) => route.settings.name == '/user');
+
+// 一番最初のページまで戻る
+Navigator.of(context).popUntil((route) => route.isFirst);
+```
