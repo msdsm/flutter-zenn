@@ -606,3 +606,99 @@ const BoxConstraints({
 - 末端から決まった自身のサイズを親Widgetに伝達していき、親Widgetは伝達された子Widgetのサイズｗもとに今度は子Widgetの配置を決める
 
 
+### `main.dart`の中身
+#### `import`
+```dart
+import 'package:flutter/material.dart';
+```
+- `material`パッケージはマテリアルデザインのUIコンポーネントを使うためのパッケージ
+
+#### `void main()`
+- ファイルを指定して実行すると呼び出されるのが`main`関数
+- `flutter run`コマンドでは指定がなければ自動的に`lib/main.dart`が実行される
+- `flutter run -t [filename]`とすると実行ファイルを指定でき、この場合はfilename内のmain関数が実行される
+```dart
+void main() {
+  runApp(const MyApp());
+}
+```
+
+#### `runApp()`
+- `runApp()`関数はアプリを構成するWidget群を受け取り描画エンジンにつなげる
+- 引数として渡すWidgetがアプリのルート
+  - Widgetツリーのルートノード
+
+#### `MyApp`クラス
+- `StateessWidget`を継承するクラス
+```dart
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+```
+- `build`メソッドをoverrideする形でWidgetを返却
+- `MaterialApp`はgoogleが提供するマテリアルデザインに準拠するWidgetとそれらで使う様々な機能を提供してくれるWidget
+  - title, themeを指定
+    - `ThemeData`はアプリ全体のビジュアルに関するテーマを定義するクラス
+      - 大量のフィールドを持つ(今回はcolorScheme,useMaterial3しか指定していないけど)
+  - homeフィールドには最初に表示するWidgetを指定する
+    - 今回は`MyHomePage`を指定しているのでアプリを立ち上げるとMyHomePageが表示されている
+
+#### `MyHomePage`
+- MyHomePageクラスはStatefulWidgetを継承したクラスでこのクラスが返しているWidget群は_MyHomePageStateクラスの`build`メソッドにある
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+```
+- `Scaffold`Widgetはマテリアルデザインのアプリを作る(MaterialAppを使う)場合にページの元となるWidgetのこと
+  - 白紙のページのようなもの
+  - bodyに渡すWidgetがページの中身
+- `AppBar`Widgetは画面上部のアプリバーを表示するWidget
+  - titleに渡すWidgetがアプリバーのタイトルになる
+- `Center`Widgetは子Widgetを中央に配置するWidget
+  - これは`AppBar`の様にUIコンポーネントを描画するWidgetではなくレイアウトのみを行うWidget
+- `Column`Widgetは縦に子Widgetを配置するWidget
+  - childrenフィールドに複数のWidgetを与えることができ、与えた子Widgetを縦に並べる
+- `Text`Widgetは文字列を表示するWidget
+  - 第一引数に渡した文字列を表示する
+  - フォントや色、サイズなどを指定するフィールドもある
+- `FloatingActionButton`Widgetは画面下部の画面の上に浮いたようなボタンを表示するWidget
+  - 他にもいくつかのボタンWidgetがある
+  - ボタンWidgetはユーザーのタップを検知することができ、タップされた際に実行する処理を`onPressed`フィールドに渡すことができる
+- `Icon`Widgetはアイコンを表示するためのWidget
