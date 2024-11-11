@@ -813,3 +813,76 @@ Navigator.of(context).popUntil((route) => route.settings.name == '/user');
 // 一番最初のページまで戻る
 Navigator.of(context).popUntil((route) => route.isFirst);
 ```
+
+### API呼び出し
+- FlutterからAPI通信を行うには`http`パッケージを活用する
+- パッケージの追加は`flutter pub add http`
+- 使用するファイルで以下のようにimportすればよい
+```dart
+import 'package:http/http.dart' as http;
+```
+- PUTメソッドを使う場合は以下のように書ける
+```dart
+ture<Album> updateAlbum(String title) async {
+  final response = await http.put(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/1'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    },
+    body: jsonEncode(<String, String>{
+      'title': title,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return Album.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to update album.');
+  }
+}
+```
+- `http.put()`メソッドでPUTメソッド利用
+- 第一引数にはエンドポイントを指定
+- `headers`でヘッダー情報を指定
+- `body`にはMap型でリクエストボディを指定できる
+- 得られたresponseは`statusCode`フィールドでステータスコードを参照できる
+- レスポンスボディは`body`フィールド
+- PUTメソッドと同様にしてGET, POST, PATCH, DELETEも可能
+```dart
+Future<http.Response> fetchAlbum() {
+  return http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+}
+Future<http.Response> createAlbum(String title) {
+  return http.post(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'title': title,
+    }),
+  );
+}
+Future<http.Response> updateUserId(String userId) {
+  return http.patch(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/1'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'userId': userId,
+    }),
+  );
+}
+Future<http.Response> deleteAlbum(String id) async {
+  final http.Response response = await http.delete(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/$id'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+
+  return response;
+}
+```
