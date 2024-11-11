@@ -576,3 +576,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 ```
+
+### Constraints go down, Size go up
+- Widgetのサイズを決定づける要素は以下の2つ
+  - 親から子に渡されるConstraints(制約)
+  - Widget自身の習性
+- Constraintsは制約を意味しておりサイズの最大と最小を設定できる
+  - 子Widgetはこの与えられたサイズ領域の中で自身がとるサイズを計算する
+```dart
+const BoxConstraints({
+    this.minWidth = 0.0,
+    this.maxWidth = double.infinity,
+    this.minHeight = 0.0,
+    this.maxHeight = double.infinity,
+  }){
+    final double minWidth;
+    final double maxWidth;
+    final double minHeight;
+    final double maxHeight;
+  }
+```
+- Widget自身の習性とは、「与えられたサイズ制約の中でどのようにふるまうか」という設定
+- この習性は大きく分けて以下の3つ
+  - なるべく大きくなろうとする
+  - なるべく小さくなろうとする
+  - 制約に関係なく特定のサイズになろうとする
+- Widgetツリー構築時にツリーのルートからBoxConstraintsを末端のWidgetに達するまで渡していく
+- 末端に到達した時点で初めてWidget自身の振る舞いとBoxConstraintsを照らし合わせてサイズを決定する
+- 末端から決まった自身のサイズを親Widgetに伝達していき、親Widgetは伝達された子Widgetのサイズｗもとに今度は子Widgetの配置を決める
+
+
