@@ -886,3 +886,16 @@ Future<http.Response> deleteAlbum(String id) async {
   return response;
 }
 ```
+
+### `Uri.https()`
+- APIのエンドポイントを指定できる
+- 第一引数にbaseUrl
+- 第二引数にURLパス
+- 第三引数にクエリパラメータ
+  - `Map<String,dynamic>`型で指定
+```dart
+final uri = Uri.https('qiita.com', '/api/v2/items', {
+    'query': 'title:$keyword',
+    'per_page': '10',
+});
+```
