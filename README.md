@@ -576,3 +576,313 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 ```
+
+### Constraints go down, Size go up
+- Widgetのサイズを決定づける要素は以下の2つ
+  - 親から子に渡されるConstraints(制約)
+  - Widget自身の習性
+- Constraintsは制約を意味しておりサイズの最大と最小を設定できる
+  - 子Widgetはこの与えられたサイズ領域の中で自身がとるサイズを計算する
+```dart
+const BoxConstraints({
+    this.minWidth = 0.0,
+    this.maxWidth = double.infinity,
+    this.minHeight = 0.0,
+    this.maxHeight = double.infinity,
+  }){
+    final double minWidth;
+    final double maxWidth;
+    final double minHeight;
+    final double maxHeight;
+  }
+```
+- Widget自身の習性とは、「与えられたサイズ制約の中でどのようにふるまうか」という設定
+- この習性は大きく分けて以下の3つ
+  - なるべく大きくなろうとする
+  - なるべく小さくなろうとする
+  - 制約に関係なく特定のサイズになろうとする
+- Widgetツリー構築時にツリーのルートからBoxConstraintsを末端のWidgetに達するまで渡していく
+- 末端に到達した時点で初めてWidget自身の振る舞いとBoxConstraintsを照らし合わせてサイズを決定する
+- 末端から決まった自身のサイズを親Widgetに伝達していき、親Widgetは伝達された子Widgetのサイズｗもとに今度は子Widgetの配置を決める
+
+
+### `main.dart`の中身
+#### `import`
+```dart
+import 'package:flutter/material.dart';
+```
+- `material`パッケージはマテリアルデザインのUIコンポーネントを使うためのパッケージ
+
+#### `void main()`
+- ファイルを指定して実行すると呼び出されるのが`main`関数
+- `flutter run`コマンドでは指定がなければ自動的に`lib/main.dart`が実行される
+- `flutter run -t [filename]`とすると実行ファイルを指定でき、この場合はfilename内のmain関数が実行される
+```dart
+void main() {
+  runApp(const MyApp());
+}
+```
+
+#### `runApp()`
+- `runApp()`関数はアプリを構成するWidget群を受け取り描画エンジンにつなげる
+- 引数として渡すWidgetがアプリのルート
+  - Widgetツリーのルートノード
+
+#### `MyApp`クラス
+- `StateessWidget`を継承するクラス
+```dart
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+```
+- `build`メソッドをoverrideする形でWidgetを返却
+- `MaterialApp`はgoogleが提供するマテリアルデザインに準拠するWidgetとそれらで使う様々な機能を提供してくれるWidget
+  - title, themeを指定
+    - `ThemeData`はアプリ全体のビジュアルに関するテーマを定義するクラス
+      - 大量のフィールドを持つ(今回はcolorScheme,useMaterial3しか指定していないけど)
+  - homeフィールドには最初に表示するWidgetを指定する
+    - 今回は`MyHomePage`を指定しているのでアプリを立ち上げるとMyHomePageが表示されている
+
+#### `MyHomePage`
+- MyHomePageクラスはStatefulWidgetを継承したクラスでこのクラスが返しているWidget群は_MyHomePageStateクラスの`build`メソッドにある
+```dart
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+```
+- `Scaffold`Widgetはマテリアルデザインのアプリを作る(MaterialAppを使う)場合にページの元となるWidgetのこと
+  - 白紙のページのようなもの
+  - bodyに渡すWidgetがページの中身
+- `AppBar`Widgetは画面上部のアプリバーを表示するWidget
+  - titleに渡すWidgetがアプリバーのタイトルになる
+- `Center`Widgetは子Widgetを中央に配置するWidget
+  - これは`AppBar`の様にUIコンポーネントを描画するWidgetではなくレイアウトのみを行うWidget
+- `Column`Widgetは縦に子Widgetを配置するWidget
+  - childrenフィールドに複数のWidgetを与えることができ、与えた子Widgetを縦に並べる
+- `Text`Widgetは文字列を表示するWidget
+  - 第一引数に渡した文字列を表示する
+  - フォントや色、サイズなどを指定するフィールドもある
+- `FloatingActionButton`Widgetは画面下部の画面の上に浮いたようなボタンを表示するWidget
+  - 他にもいくつかのボタンWidgetがある
+  - ボタンWidgetはユーザーのタップを検知することができ、タップされた際に実行する処理を`onPressed`フィールドに渡すことができる
+- `Icon`Widgetはアイコンを表示するためのWidget
+
+### 画面遷移
+- Flutterでは`Navigator`クラスに`Route`クラスでラップしたページを渡すことでページの遷移を行う
+- `Navigator`はstack構造になっていてページ遷移するたびにページが積まれていきユーザーはtopのページを見ている
+  - そのため遷移してきたページを逆順に戻れる
+- 以下はあるページからPageBに遷移するコード
+```dart
+Navigator.of(context).push(
+  MaterialPageRoute(
+    builder: (context) => PageB()
+  ),
+);
+```
+- `Navigator`クラスの`push`メソッドに`PageB`クラスをラップした`MaterialPageRoute`クラスを渡している
+- `MaterialPageRoute`は`Route`クラスを継承したクラスでマテリアルデザインに沿ったページ遷移を行うための`Route`クラス
+- `MaterialPageRoute`クラスの`builder`というパラメータはコールバック関数を受け取りその返り値として`Navigator`クラスに渡したいページを指定する
+```dart
+MaterialPageRoute(
+  builder: (context) => PageB(),
+),
+```
+- これを使用してボタンを押すと画面遷移する機能は以下のように書ける
+```dart
+FloatinActionButton(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PageB(),
+      ),
+    );
+  },
+)
+```
+- ページを追加して遷移する`push()`メソッド以外にも`pop()`,`pushReplacement()`,`pushAndRemoveUntil()`, `popUntil()`などがある
+
+#### `pop()`
+- 前のページに遷移するメソッドであり、現在見ているページを破棄する
+```dart
+Navigator.of(context).pop();
+```
+- このpop時に値を渡すということも可能
+- 値を返す画面へ遷移する際に返り値を受け取る前提で処理を記述すればよい
+- 返り値を受け取る処理は非同期処理なので`async`と`await`を使用する
+- 値が返されない場合もあるので`nullable`な型にする(`String?`のように)
+```dart
+
+// 値を受け取る前提で遷移する
+...
+onTap: () async {
+   final String? result = await Navigator.of(context).push<String?>(
+        MaterialPageRoute(
+            builder: (context) => PageB(),
+        ),
+    );
+    print(result);
+},
+...
+
+// 値を持って、前の画面に戻る
+Navigator.of(context).pop('戻る際に渡したい値');
+```
+
+
+#### `pushReplacement()`
+- 現在のページを新しいページと入れ替えるメソッド
+```dart
+Navigator.of(context).pushReplacement(
+    MaterialPageRoute(
+        builder: (context) => PageB(),
+    ),
+);
+```
+- 一番上にスタックされている`Route`オブジェクトを新しい`Route`オブジェクトと差し替える
+
+#### `pushAndRemoveUntil()`
+- 次のページに遷移しつつ、特定の条件のページまで過去のページを取り除くメソッド
+- 第一引数に遷移先の`Route`オブジェクトを渡す
+- 第二引数にはコールバック関数を渡す
+  - このコールバック関数の引数は`Route`オブジェクト
+  - コールバック関数の返り値はboolで、返り値がtrueとなるまで`Route`オブジェクトを取り除き続ける
+
+```dart
+// 全ての過去のページを取り除く
+Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(
+        builder: (context) => PageD(),
+    ),
+    (route) => false,
+);
+
+// パス名が'/home'のページに辿り着くまで過去のページを取り除く
+Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(
+        builder: (context) => PageD(),
+    ),
+    (route) => route.settings.name == '/home',
+);
+```
+
+#### `popUntil()`
+- 指定のページまで一気に戻るメソッド
+- 引数にコールバック関数を渡す
+  - コールバック関数の引数は`Route`オブジェクト
+  - 返り値はboolでtrueを返すまでスタックされている`Route`オブジェクトを取り除く
+```dart
+// 特定のページまで戻る
+Navigator.of(context).popUntil((route) => route.settings.name == '/user');
+
+// 一番最初のページまで戻る
+Navigator.of(context).popUntil((route) => route.isFirst);
+```
+
+### API呼び出し
+- FlutterからAPI通信を行うには`http`パッケージを活用する
+- パッケージの追加は`flutter pub add http`
+- 使用するファイルで以下のようにimportすればよい
+```dart
+import 'package:http/http.dart' as http;
+```
+- PUTメソッドを使う場合は以下のように書ける
+```dart
+ture<Album> updateAlbum(String title) async {
+  final response = await http.put(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/1'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    },
+    body: jsonEncode(<String, String>{
+      'title': title,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return Album.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to update album.');
+  }
+}
+```
+- `http.put()`メソッドでPUTメソッド利用
+- 第一引数にはエンドポイントを指定
+- `headers`でヘッダー情報を指定
+- `body`にはMap型でリクエストボディを指定できる
+- 得られたresponseは`statusCode`フィールドでステータスコードを参照できる
+- レスポンスボディは`body`フィールド
+- PUTメソッドと同様にしてGET, POST, PATCH, DELETEも可能
+```dart
+Future<http.Response> fetchAlbum() {
+  return http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+}
+Future<http.Response> createAlbum(String title) {
+  return http.post(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'title': title,
+    }),
+  );
+}
+Future<http.Response> updateUserId(String userId) {
+  return http.patch(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/1'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'userId': userId,
+    }),
+  );
+}
+Future<http.Response> deleteAlbum(String id) async {
+  final http.Response response = await http.delete(
+    Uri.parse('https://jsonplaceholder.typicode.com/albums/$id'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+
+  return response;
+}
+```
