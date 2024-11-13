@@ -13,13 +13,39 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+    List<Article> articles = []; // 検索結果を格納する変数(state)
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
             appBar: AppBar(
                 title: const Text('Qiita Search'),
             ),
-            body: Container(),
+            body: Column(
+                children: [
+                    // 検索ボックス
+                    Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 36,
+                        ),
+                        child: TextField(
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                            ),
+                            decoration: InputDecoration(
+                                hintText: '検索ワードを入力してください',
+                            ),
+                            onSubmitted: (String value) async {
+                                final results = await searchQiita(value);
+                                setState(()=>articles = results);
+                            },
+                        ),
+                    ),
+                    // 検索結果一覧
+                ],
+            ),
         );
     }
 
