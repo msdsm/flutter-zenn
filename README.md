@@ -899,3 +899,44 @@ final uri = Uri.https('qiita.com', '/api/v2/items', {
     'per_page': '10',
 });
 ```
+
+### `Padding` widget
+- 余白を作れる
+- 余白を追加したいWidgetをPadding widgetで囲めば良い
+- `padding`プロパティでいろいろ設定できる
+  - `EdgeInsets`を渡すことで指定
+  - `EdgeInsets`では上下左右を1つ1つ指定できる
+  - 以下の例では垂直、水平にそれぞれ同じ分だけ余白を作る`symmetric()`メソッドを使用
+
+```dart
+Padding( // ← Paddingで囲む
+  padding: const EdgeInsets.symmetric(
+    vertical: 12,
+    horizontal: 36,
+  ),
+  child: TextField(), // TextFieldに余白を作成
+),
+```
+
+### `TextField` Widget
+- テキストボックス
+- `style`プロパティに`TextStyle`を渡すことでいろいろ設定できる
+- `decoration`プロパティに`InputDecoration`を渡すことでプレースホルダーを指定できる
+- `onSubmitted`プロパティにはユーザーがEnterを押した際に発火する処理を指定できる
+  - コールバック関数を与える
+  - この関数は引数としてTextFieldに記入された文字列を受け取る
+
+```dart
+TextField(
+  style: TextStyle(
+    fontSize: 18,
+    color: Colors.black,
+  ),
+  decoration: InputDecoration( // InputDecorationを渡す
+    hintText: '検索ワードを入力してください',
+  ),
+  onSubmitted: (String value) {
+    print(value); // ← 入力された文字列を受け取り処理を実行する
+  },
+)
+```
