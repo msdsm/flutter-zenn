@@ -940,3 +940,53 @@ TextField(
   },
 )
 ```
+
+### `intl`
+- `DateTime`の表示を変更できる
+- `flutter pub add intl`で追加
+```dart
+import 'package:intl/intl.dart';
+```
+- yyyy/MM/dd形式で表示する場合は以下のように`DateFormat`関数を使う
+```dart
+Text(
+  DateFormat('yyyy/MM/dd').format(article.createdAt)
+)
+```
+
+### `Text` widgetの`overflow`プロパティ
+- `Text` widgetには`maxLines`プロパティで行数を限定できる
+- この時、表示範囲を超える文字数の場合にどのように表示するかを指定できる`overflow`プロパティがある
+- 以下のように指定する
+```dart
+Text(
+  ...
+  overflow: TextOverflow.ellipsis,
+)
+```
+- `overflow`で指定できるのは以下
+  - `clip` : 行数を超えた文字は表示されない
+  - `fade` : 行数を超えた文字は表示されるがフェードアウトする
+  - `ellipsis` : 行数を超えた文字は`...`で省略される
+
+
+### `Column`widgetの`crossAxisAlignment`プロパティ
+- どこに寄せるかを指定できる
+- `CrossAxisAlignment.end`を指定すると右寄り
+- `CrossAxisAlignment.start`を渡すと左寄せ
+### `Row` widgetの`mainAxisAlignment`プロパティ
+- `Row`の主軸方向にどう子要素を配置するかを指定するプロパティ
+- `MainAxisAlignment.spaceBetween`を指定すると幅全部を使って子要素の間には等間隔のスペースを配置する
+### `ListView` widget と `Expanded` widget
+- `ListView` は`children`プロパティに指定されたWidgetをスクロール可能なリストとして表示する
+- `ListView`単体は画面サイズに関わりなく縦方向にどこまでも大きくなろうとする習性があるため、`ListView`は`ListView`に対してサイズ制限を伝えるWidgetで囲う必要がある
+- `Expanded`は`Column`や`Row`の中で使われることを前提としたWidgetで、`Column`や`Row`の子要素を並べたときに残っている画面領域を計算してその領域をサイズ制限として自身の子要素につたえる
+```dart
+Expanded(
+  child: ListView(
+    children: articles
+        .map((article) => ArticleContainer(article: article))
+        .toList(),
+  ),
+),
+```
