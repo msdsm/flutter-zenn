@@ -990,3 +990,63 @@ Expanded(
   ),
 ),
 ```
+
+
+### WebView
+- ウェブビューとはアプリ内でブラウザのページを動作させる機能のこと
+- 今回の例はQiitaのページをアプリ内から閲覧できるようにする
+- `flutter pub add webview_flutter`
+```dart
+import 'package:webview_flutter/webview_flutter.dart';
+```
+- 以下のように`WebViewController`インスタンスを渡す形で`WebView` Widgetを利用する
+- controllerを作成する際に`loadRequest`メソッドでURL指定する
+
+### `late`
+- 遅延初期化するために使用される
+- 変数の宣言時には初期化を指定せずに後から初期化を行う
+- 変数の初期化を実際にその変数が使われるタイミングに遅らせる
+
+### カスケードオペレータ`..`
+- 同じオブジェクトに対して複数の操作を連続して行うことができる
+- カスケードオペレータの簡単な例
+```dart
+var list = <int>[]
+  ..add(1)
+  ..add(2)
+  ..add(3);
+// listは[1, 2, 3]を持つ
+
+// カスケードオペレータを使わないとこうなる
+var list = <int>[];
+list.add(1);
+list.add(2);
+list.add(3);
+```
+
+### `GestureDetector` Widget
+- 子要素に対してタップイベントを実装するためのWidget
+- `onTap`パラメータにタップされた際の処理を定義することができる
+```dart
+child: GestureDetector( // GestureDetectorでContainerを囲う
+  onTap: () {},
+  child: Container(
+    ...
+  ),
+),
+```
+- 今回は以下のようにしてタップ時に画面遷移を実装
+```dart
+child: GestureDetector(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: ((context) => ArticleScreen(article: article)),
+      ),
+    );
+  },
+  child: Container(
+    ...
+  ),
+),
+```
